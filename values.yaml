@@ -1,0 +1,32 @@
+# Default values for api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+deployment:
+  replicas: 1
+  image:
+    healthCheck:
+      enabled: true
+    ports:
+      http: 8080
+    pullPolicy: Always
+  # horizontal pod autoscaler
+  hpa:
+    maxReplicas: 2
+    resources:
+      cpu:
+        targetAverageUtilization: 60 # unit: percentile
+      memory:
+        targetAverageUtilization: 80 # unit: percentile
+
+resources: {}
+  ## If you intend to use the 'resources' uncomment the lines below and remove value '{}' from it
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+tolerations: []

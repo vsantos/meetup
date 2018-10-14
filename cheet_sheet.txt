@@ -1,0 +1,15 @@
+## install chart 
+helm install ./helm \
+    --values values.yaml \
+    --name meetup \
+    --set=app=meetup,version=response_mocker,build=manual,replicaCount=1 \
+    --namespace istio-apps
+
+## change loadbalancer from response mocker's CNAME if needed
+scripts/update_dns_entry.sh "${NEW_DNS_ENTRY}"
+
+## run bazuka
+scripts/bazooka.sh forbidden 5
+
+## delete helm chart
+helm del --purge meetup
