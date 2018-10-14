@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.app }}-{{ .Values.version | replace "." "" | replace "/" "" | replace "_" "" }}-{{ .Values.build }}
+  labels:
+    app: {{ .Values.app }}
+    chart: {{ template "api.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    version: {{ .Values.version }}
+    build: {{ quote .Values.build }}
+spec:
+  ports:
+    - port: {{ .Values.deployment.image.ports.http }}
+      targetPort: {{ .Values.deployment.image.ports.http }}
+      name: http
+  selector:
+    app: {{ .Values.app }}
+    release: {{ .Release.Name }}
+    version: {{ .Values.version }}
+    build: {{ quote .Values.build }}

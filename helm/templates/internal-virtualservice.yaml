@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Values.app }}-internal-virtualservice
+spec:
+  hosts:
+  - {{ .Values.app }}-{{ .Values.version | replace "." "" | replace "/" "" | replace "_" "" }}-{{ .Values.build }}
+  http:
+  - match:
+    - uri:
+        regex: .+
+    route:
+    - destination:
+        host: {{ .Values.app }}-{{ .Values.version | replace "." "" | replace "/" "" | replace "_" "" }}-{{ .Values.build }}
+        port:
+          number: {{ .Values.deployment.image.ports.http }}

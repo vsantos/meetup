@@ -1,0 +1,74 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Values.app }}-{{ .Values.version | replace "." "" | replace "/" "-" | replace "_" "" }}-{{ .Values.build }}
+  labels:
+    app: {{ .Values.app }}
+    chart: {{ template "api.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    version: {{ .Values.version }}
+    build: {{ quote .Values.build }}
+spec:
+  replicas: {{ .Values.deployment.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app }}
+      release: {{ .Release.Name }}
+      version: {{ .Values.version }}
+      build: {{ quote .Values.build }}
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.deployment.role }}
+        iam.amazonaws.com/role: {{ .Values.deployment.role }}
+        {{ else }}
+        iam.amazonaws.com/role: {{ .Values.app }}-role
+        {{- end }}
+      labels:
+        app: {{ .Values.app }}
+        release: {{ .Release.Name }}
+        version: {{ .Values.version }}
+        build: {{ quote .Values.build }}
+    spec:
+      containers:
+        - name: {{ .Values.app }}
+          image: "{{ .Values.deployment.image.dockerRegistry | default "270036487593.dkr.ecr.us-east-1.amazonaws.com" }}/{{ .Values.app }}:{{ .Values.version }}"
+          imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.deployment.image.ports.http }}
+              protocol: TCP
+          {{- if .Values.deployment.image.healthCheck.enabled }}
+          livenessProbe:
+            exec:
+              command:
+              - curl
+              - -fsS
+              - http://localhost:{{ .Values.deployment.image.ports.http }}/health
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+              - curl
+              - -fsS
+              - http://localhost:{{ .Values.deployment.image.ports.http }}/health
+            initialDelaySeconds:  15
+            periodSeconds: 5
+            successThreshold: 1
+          {{- end }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
