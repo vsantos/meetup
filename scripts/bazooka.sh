@@ -23,7 +23,7 @@ if [[ "${1}" == '' ]] || [[ "${2}" == '' ]]; then
 fi
 
 RESPONSE_MOCKER_PROTO="https"
-RESPONSE_MOCKER_HOST='meetup-responsemocker.pismolabs.io'
+RESPONSE_MOCKER_HOST='meetup-responsemocker.pismo.cloud'
 RESPONSE_MOCKER_PORT='443'
 RESPONSE_MOCKER_ENDPOINT="${1}"
 RESPONSE_MOCKER_NUMBER_OF_REQUESTS="${2}"

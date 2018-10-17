@@ -7,7 +7,7 @@ spec:
   - istio-gateway
   - istio-gateway-internal
   hosts:
-  - {{ .Values.app }}-{{ .Values.version  | replace "." "" | replace "/" "" | replace "_" "" }}.pismolabs.io
+  - meetup-responsemocker.pismo.cloud
   http:
   - match:
     - uri:
